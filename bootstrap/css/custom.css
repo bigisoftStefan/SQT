@@ -1,0 +1,325 @@
+/* CSS From Stefan Biegler */
+
+/* Standard IDs*/
+#body
+{
+	background-color: #e2fbf3;
+	padding-top: 60px;
+}
+
+#headline
+{
+	margin-top: 5%;
+	margin-bottom: 5%;
+}
+
+#dialog
+{
+	background-color: #99e2ca;
+}
+
+.disabled {
+    pointer-events:none; //This makes it not clickable
+    opacity:0.6;         //This grays it out to look disabled
+}
+
+#dialog_header
+{
+	text-decoration: none;
+	color: #666;
+	font-weight: bold;
+	font-size: 18px;
+	-webkit-transition: all 0.1s linear;
+	-moz-transition: all 0.1s linear;
+	transition: all 0.1s linear;
+	color: #54bf9e;
+}
+
+#navbar
+{
+	background-color: rgba(155, 227, 203, 0.43); 
+	border-bottom: black; 
+	border-bottom-style: solid;
+	border-bottom-width: thin;
+}
+
+.navheader
+{
+	text-decoration: none;
+	color: black;
+}
+
+.active
+{
+	font-weight: bold;
+	font-size: large;
+}
+
+#icon_navbar
+{
+	color: black;
+}
+
+#caret_navbar
+{
+	color: black;
+}
+
+#refresh_bar
+{
+	background-image: none;
+    background-color: #54bf9e;
+}
+
+.progress-bar
+{
+	background-image: none;
+    background-color: #54bf9e;
+}
+
+/* Moves the icons of the navbar a little bit farther away from right edge*/
+.navbar-nav.navbar-right:last-child {
+    margin-right: 0;
+}
+
+/* Login CSS */
+/* Based on: https:\//bootsnipp.com/snippets/featured/login-and-register-tabbed-form */
+
+.panel-login {
+	border-color: #ccc;
+	-webkit-box-shadow: 0px 2px 3px 0px rgba(0,0,0,0.2);
+	-moz-box-shadow: 0px 2px 3px 0px rgba(0,0,0,0.2);
+	box-shadow: 0px 2px 3px 0px rgba(0,0,0,0.2);
+}
+.panel-login>.panel-heading {
+	color: #00415d;
+	background-color: #fff;
+	border-color: #fff;
+	text-align:center;
+}
+.panel-login>.panel-heading a{
+	text-decoration: none;
+	color: #666;
+	font-weight: bold;
+	font-size: 18px;
+	-webkit-transition: all 0.1s linear;
+	-moz-transition: all 0.1s linear;
+	transition: all 0.1s linear;
+}
+.panel-login>.panel-heading a.active{
+	color: #54bf9e;
+}
+.panel-login>.panel-heading hr{
+	margin-top: 10px;
+	margin-bottom: 0px;
+	clear: both;
+	border: 0;
+	height: 1px;
+	background-image: -webkit-linear-gradient(left,rgba(0, 0, 0, 0),rgba(0, 0, 0, 0.15),rgba(0, 0, 0, 0));
+	background-image: -moz-linear-gradient(left,rgba(0,0,0,0),rgba(0,0,0,0.15),rgba(0,0,0,0));
+	background-image: -ms-linear-gradient(left,rgba(0,0,0,0),rgba(0,0,0,0.15),rgba(0,0,0,0));
+	background-image: -o-linear-gradient(left,rgba(0,0,0,0),rgba(0,0,0,0.15),rgba(0,0,0,0));
+}
+.panel-login input[type="text"],.panel-login input[type="email"],.panel-login input[type="password"] {
+	height: 45px;
+	border: 1px solid #ddd;
+	font-size: 16px;
+	-webkit-transition: all 0.1s linear;
+	-moz-transition: all 0.1s linear;
+	transition: all 0.1s linear;
+}
+.panel-login input:hover,
+.panel-login input:focus {
+	outline:none;
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
+	border-color: #ccc;
+}
+.btn-login {
+	background-color: #59B2E0;
+	outline: none;
+	color: #fff;
+	font-size: 14px;
+	height: auto;
+	font-weight: normal;
+	padding: 14px 0;
+	text-transform: uppercase;
+}
+.btn-login:hover:not([disabled]),
+.btn-login:focus:not([disabled]) {
+	color: #fff;
+	background-color: #53A3CD;
+	border-color: #53A3CD;
+}
+
+.forgot-password {
+	text-decoration: underline;
+	color: #888;
+}
+.forgot-password:hover,
+.forgot-password:focus {
+	text-decoration: underline;
+	color: #666;
+}
+
+.btn-register {
+	background-color: #1CB94E;
+	outline: none;
+	color: #fff;
+	font-size: 14px;
+	height: auto;
+	font-weight: normal;
+	padding: 14px 0;
+	text-transform: uppercase;
+	border-color: #1CB94A;
+}
+.btn-register:hover,
+.btn-register:focus {
+	color: #fff;
+	background-color: #1CA347;
+	border-color: #1CA347;
+}
+
+/*Grid Filter*/
+/*Inspired from http:\//bootsnipp.com/snippets/featured/panel-tables-with-filter */
+.filterable {
+    margin-top: 15px;
+}
+.filterable .panel-heading .pull-right {
+    margin-top: -20px;
+}
+.filterable .filters input[disabled] {
+    background-color: transparent;    
+    border: none;
+    cursor: auto;
+    box-shadow: none;
+    padding: 0;
+    height: auto;
+}
+.filterable .filters input[disabled]::-webkit-input-placeholder {
+    color: #333;
+}
+.filterable .filters input[disabled]::-moz-placeholder {
+    color: #333;
+}
+.filterable .filters input[disabled]:-ms-input-placeholder {
+    color: #333;
+}
+
+#grid_panel
+{
+	padding-left: 0;
+	padding-right: 0;
+	
+	margin-left: 5%;
+	margin-right: 5%;
+	
+	height: 50%;
+	
+	border-style: solid;
+	border-color: black;
+	border-width: thin;
+	
+	/*Allows to scroll*/
+	overflow-y:auto;
+	
+	overflow-x: auto;
+}
+
+#add_survey
+{
+	margin-right: 1.5em;
+}
+
+.table_odd
+{
+	background-color: #e2fbf3;
+}
+
+/* Style of the quality score */
+.qs_good
+{
+	background-color: #29f56d;
+	opacity: 0.8;
+}
+
+.qs_medium
+{
+	background-color: yellow;
+	opacity: 0.8;
+}
+
+.qs_bad
+{
+	background-color: rgba(255, 0, 0, 0.71);
+	opacity: 0.8;
+}
+
+.qs_notavailable
+{
+	background-color: green;
+	opacity: 0.8;
+}
+
+.details
+{
+	background-color: rgb(95, 179, 222);
+	color: white;
+	margin-left: 3%;	
+}
+
+.export
+{
+	background-color: rgb(158, 225, 202);
+	color: white;
+	margin-left: 3%;	
+}
+
+.remove
+{
+	background-color: rgba(255, 0, 0, 0.71);
+	color: white;
+	margin-left: 3%;	
+	margin-right: 0em;
+}
+
+#action_header
+{
+	width: 11em;
+}
+
+.table_header_center
+{
+	text-align: center;
+}
+
+.table_rows_center
+{
+	text-align: center;
+}
+
+.check
+{
+	text-align: center;
+}
+
+
+@media only screen and (max-width: 768px) {
+    /* For mobile phones: */
+    .details 
+    {
+        margin-bottom: 5px;
+    }
+    
+    .export
+	{
+		margin-bottom: 5px;
+	}
+	
+	#grid_panel
+	{
+		width: 100%;
+		margin-left: 1em;
+	}
+}
