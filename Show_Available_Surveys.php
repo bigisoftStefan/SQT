@@ -47,20 +47,20 @@ if (!($statement->errno))
 	$statement->close();
 
 	// Get all available surveys for the current user
-	$statement = $db_link->prepare("SELECT Surveys.id, Surveys.name, Surveys.topic, Surveys.quality_score FROM Surveys join User on Surveys.user_id = User.id where User.id = ?");
+	$statement = $db_link->prepare("SELECT Surveys.id, Surveys.name, Surveys.topic, Surveys.quality_score, Surveys.survey_link FROM Surveys join User on Surveys.user_id = User.id where User.id = ? ORDER by Surveys.id ASC");
 	$statement->bind_param("i", $db_user);
 	$statement->execute();
     
     if (!($statement->errno))
 	{
-		$statement->bind_result($id,$survey_name,$survey_topic,$survey_quality_score);
+		$statement->bind_result($id,$survey_name,$survey_topic,$survey_quality_score, $survey_link);
 				
 		while($statement->fetch())
 		{
 			// Saving the data into a json array
-			// '[''{ "id":"1" , "name":"test" , "topic":"test" , "qualityscore":"60" } ]';
+			// '[''{ "id":"1" , "name":"test" , "topic":"test" , "qualityscore":"60", "surveylink":"www.orf.a" } ]';
 			
-			$jsonArrayObject = (array('id' => $id, 'name' => $survey_name, 'topic' => $survey_topic, 'qualityscore' => $survey_quality_score));
+			$jsonArrayObject = (array('id' => $id, 'name' => $survey_name, 'topic' => $survey_topic, 'qualityscore' => $survey_quality_score, 'survey_link' => $survey_link));
             $json_array[$runner] = $jsonArrayObject;
 			
 			$runner ++;

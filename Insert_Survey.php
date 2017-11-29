@@ -20,6 +20,7 @@ if ( !$db_link )
 $user_mail = $_POST['user_mail_address'];
 $survey_topic = $_POST['survey_topic'];
 $survey_name = $_POST['survey_name'];
+$survey_link = $_POST['survey_link'];
 
 // User value
 $db_user = 0;
@@ -44,11 +45,25 @@ if (!($statement->errno))
 	}
     		
 	$statement->close();
+	
+	$statement = null;
+	
+	if($survey_link == "")
+	{
+		// Saves the new survey into the data base
+		$statement = $db_link->prepare("INSERT INTO Surveys (user_id,name,topic) VALUES (?,?,?)");
+		$statement->bind_param("sss", $db_user,$survey_name,$survey_topic);
+		$statement->execute();
+	}
+	else
+	{
+		// Saves the new survey into the data base
+		$statement = $db_link->prepare("INSERT INTO Surveys (user_id,name,topic,survey_link) VALUES (?,?,?,?)");
+		$statement->bind_param("ssss", $db_user,$survey_name,$survey_topic,$survey_link);
+		$statement->execute();
+	}
 
-	// Saves the new survey into the data base
-	$statement = $db_link->prepare("INSERT INTO Surveys (user_id,name,topic) VALUES (?,?,?)");
-	$statement->bind_param("sss", $db_user,$survey_name,$survey_topic);
-	$statement->execute();
+	
     
     if (!($statement->errno))
 	{

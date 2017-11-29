@@ -40,7 +40,7 @@ $survey_quality_score = array(
 	 array("anchoring",-1,0),
 	 array("straight",-1,0),
 	 array("speeding",-1,0),
-	 array("complete",-1,0)
+	 array("incomplete",-1,0)
 );
 
 // Saving the measurement id for the survey
@@ -164,14 +164,14 @@ if (!($statement->errno))
 				$quality_overall_amount = 8;
 				$quality_oervall_sum = 0 ;
 				
-				$statement= $db_link->prepare("SELECT Measuring_Attributes.id, Measuring_Attributes.patterns, Measuring_Attributes.dont_know, Measuring_Attributes.priming, Measuring_Attributes.conflict, Measuring_Attributes.anchoring, Measuring_Attributes.straight, Measuring_Attributes.speeding, Measuring_Attributes.complete FROM Measuring_Attributes join Response_Measuring on Measuring_Attributes.id = Response_Measuring.measuring_id join Responses on Response_Measuring.response_id = Responses.id where Responses.id = ? and Responses.evaluated= 1");
+				$statement= $db_link->prepare("SELECT Measuring_Attributes.id, Measuring_Attributes.patterns, Measuring_Attributes.dont_know, Measuring_Attributes.priming, Measuring_Attributes.conflict, Measuring_Attributes.anchoring, Measuring_Attributes.straight, Measuring_Attributes.speeding, Measuring_Attributes.incomplete FROM Measuring_Attributes join Response_Measuring on Measuring_Attributes.id = Response_Measuring.measuring_id join Responses on Response_Measuring.response_id = Responses.id where Responses.id = ? and Responses.evaluated= 1");
 				$statement->bind_param("i", $dat[0]);
 
 				$statement->execute();
 			    
 				if (!($statement->errno))
 				{	
-					$statement->bind_result($measuring_id, $db_patterns, $db_dont, $db_priming, $db_conflict, $db_anchoring, $db_straight, $db_speeding, $db_complete);
+					$statement->bind_result($measuring_id, $db_patterns, $db_dont, $db_priming, $db_conflict, $db_anchoring, $db_straight, $db_speeding, $db_incomplete);
 			
 					while ($statement->fetch())
 					{			
@@ -181,7 +181,7 @@ if (!($statement->errno))
 						// else there is no caluclation of the other attributes
 						
 						// Calculate the quality score
-						if($db_patterns >= 0 && $db_complete > 0)
+						if($db_patterns >= 0 && $db_incomplete < 100)
 						{
 							$quality_oervall_sum = $quality_oervall_sum + $db_patterns;
 							
@@ -195,7 +195,7 @@ if (!($statement->errno))
 							$db_patterns = -1;
 						}
 						
-						if($db_dont >= 0 && $db_complete > 0)
+						if($db_dont >= 0 && $db_incomplete < 100)
 						{
 							$quality_oervall_sum = $quality_oervall_sum + $db_dont;
 							
@@ -208,7 +208,7 @@ if (!($statement->errno))
 							$db_dont = -1;
 						}
 						
-						if($db_priming >= 0 && $db_complete > 0)
+						if($db_priming >= 0 && $db_incomplete < 100)
 						{
 							$quality_oervall_sum = $quality_oervall_sum + $db_priming;
 							
@@ -221,7 +221,7 @@ if (!($statement->errno))
 							$db_priming = -1;
 						}
 						
-						if($db_conflict >= 0 && $db_complete > 0)
+						if($db_conflict >= 0 && $db_incomplete < 100)
 						{
 							$quality_oervall_sum = $quality_oervall_sum + $db_conflict;
 							
@@ -234,7 +234,7 @@ if (!($statement->errno))
 							$db_conflict = -1;
 						}
 						
-						if($db_anchoring >= 0 && $db_complete > 0)
+						if($db_anchoring >= 0 && $db_incomplete < 100)
 						{
 							$quality_oervall_sum = $quality_oervall_sum + $db_anchoring;
 							
@@ -247,7 +247,7 @@ if (!($statement->errno))
 							$db_anchoring = -1;
 						}
 						
-						if($db_straight >= 0 && $db_complete > 0)
+						if($db_straight >= 0 && $db_incomplete < 100)
 						{
 							$quality_oervall_sum = $quality_oervall_sum + $db_straight;
 							
@@ -260,7 +260,7 @@ if (!($statement->errno))
 							$db_straight = -1;
 						}
 						
-						if($db_speeding >= 0 && $db_complete > 0)
+						if($db_speeding >= 0 && $db_incomplete < 100)
 						{
 							$quality_oervall_sum = $quality_oervall_sum + $db_speeding;
 							
@@ -273,11 +273,11 @@ if (!($statement->errno))
 							$db_speeding = -1;
 						}
 						
-						if($db_complete >= 0)
+						if($db_complete < 100)
 						{
 							// Conversion because in the data base is 100 percent if the
 							// responcent has complezted sucessfully the survey
-							if($db_complete == 0)
+							if($db_incomplete == 0)
 							{
 								$quality_oervall_sum = $quality_oervall_sum + 100;
 								
@@ -353,10 +353,10 @@ if (!($statement->errno))
 			$survey_anchoring = calculate_QS($survey_quality_score[4][1],$survey_quality_score[4][2]);
 			$survey_straight = calculate_QS($survey_quality_score[5][1],$survey_quality_score[5][2]);
 			$survey_speeding = calculate_QS($survey_quality_score[6][1],$survey_quality_score[6][2]);
-			$survey_complete = 100 - calculate_QS($survey_quality_score[7][1],$survey_quality_score[7][2]);
+			$survey_complete = calculate_QS($survey_quality_score[7][1],$survey_quality_score[7][2]);
 		
 			// Insert the survey quality score for the individual attributes in the data bases
-			$statement = $db_link->prepare("INSERT INTO Measuring_Attributes (patterns, dont_know, priming, conflict, anchoring, straight, speeding, complete) VALUES (?,?,?,?,?,?,?,?)");
+			$statement = $db_link->prepare("INSERT INTO Measuring_Attributes (patterns, dont_know, priming, conflict, anchoring, straight, speeding, incomplete) VALUES (?,?,?,?,?,?,?,?)");
 			$statement->bind_param("iiiiiiii", $survey_pattern, $survey_dont, $survey_priming, $survey_conflict, $survey_anchoring, $survey_straight, $survey_speeding, $survey_complete);
 			$statement->execute();
     
@@ -442,7 +442,7 @@ if (!($statement->errno))
 						$overall_survey_count--;
 					}
 					
-					if($survey_complete >= 0)
+					if($survey_complete < 100)
 					{
 						$overall_survey_sum = $overall_survey_sum + (100 - $survey_complete);
 					}

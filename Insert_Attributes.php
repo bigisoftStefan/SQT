@@ -24,11 +24,11 @@ $don_t = $_POST['don_t'];
 $conflict = $_POST['conflict'];
 $straight = $_POST['straight'];
 $pattern = $_POST['pattern'];
-$complete = $_POST['complete'];
+$incomplete = $_POST['complete'];
 $speeding = -1;
 
 // If the survey was not completed all values will be set to -1
-if($complete == 0)
+if($incomplete == 100)
 {
 	$priming = -1;
 	$anchor = -1;
@@ -39,8 +39,8 @@ if($complete == 0)
 }
 	
 // Save the attributes in the data base
-$statement = $db_link->prepare("INSERT INTO Measuring_Attributes (patterns, dont_know, priming, conflict, anchoring, straight, speeding, complete) VALUES (?,?,?,?,?,?,?,?)");
-$statement->bind_param("iiiiiiii", $pattern, $don_t, $priming, $conflict, $anchor, $straight, $speeding, $complete);
+$statement = $db_link->prepare("INSERT INTO Measuring_Attributes (patterns, dont_know, priming, conflict, anchoring, straight, speeding, incomplete) VALUES (?,?,?,?,?,?,?,?)");
+$statement->bind_param("iiiiiiii", $pattern, $don_t, $priming, $conflict, $anchor, $straight, $speeding, $incomplete);
 $statement->execute();
 	
 if (!($statement->errno))

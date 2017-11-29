@@ -60,7 +60,7 @@ if ( !$db_link )
 	</div>
 
 	    
-    <h1 class="text-center" id = "headline">Quality Score <span id="quality_score_header"></span><br /><span id="survey_title_header"></span></h1>
+    <h1 class="text-center" id = "headline">Details about Survey<br /><span id="survey_title_header"></span></h1>
     
     <!-- Definition of the nav bar -->
 	<nav class="navbar navbar-light navbar-fixed-top" id="navbar">
@@ -73,7 +73,7 @@ if ( !$db_link )
 		</div>
   		<div class="pull-right">
             <ul class="nav navbar-nav">
-	            <li class="pull-left"><a href="#" data-toggle="modal" data-target="#showThreshold" class="btn-lg" ><span class="glyphicon glyphicon-list" id="icon_navbar"></span></a></li>
+	            <!--<li class="pull-left"><a href="#" data-toggle="modal" data-target="#showThreshold" class="btn-lg" ><span class="glyphicon glyphicon-list" id="icon_navbar"></span></a></li>-->
                 <li class="dropdown pull-right">
                 <a href="#" class="dropdown-toggle btn-lg" data-toggle="dropdown"><span class="glyphicon glyphicon-user" id="icon_navbar" aria-hidden="true"></span><b class="caret" id="caret_navbar"></b></a>
                     <ul class="dropdown-menu">
@@ -98,10 +98,15 @@ if ( !$db_link )
                     <button style="margin-right: 1.5em;" class="btn btn-default btn-xs btn-survey" id="apply_changes" ><span class="glyphicon glyphicon-ok"></span> Apply Changes</button>
                 </div>
                 <div  style="margin-right: 1.5em; margin-top: -1.8em; width: auto;" class="pull-right">
-					<select class="form-control" id="exampleFormControlSelect1">
-						<option>none</option>
-						<option>Text only</option>
-						<option>Strangasdasdsadsaadse</option>
+					<select class="form-control" id="filter_dropdown">
+						<option value = "all" id ="option_all">Show All</option>
+						<option value = "incomplete" id ="option_complete">Incomplete</option>
+						<option value = "speeding" id ="option_speeding">Speeding</option>
+						<option value = "straight" id ="option_straight">Straightlining</option>
+						<option value = "priming" id ="option_priming">Left edge straightlining</option>
+						<option value = "anchoring" id ="option_anchoring">Right edge straight lining</option>
+						<option value = "dont_know" id ="option_dont">Don't know answers</option>
+						<option value = "conflict" id ="option_conflict">Conflict answers</option>
 					</select>	
                 </div>
             </div>
@@ -110,8 +115,8 @@ if ( !$db_link )
                     <tr class="filters">
                         <th><input type="text" class="form-control" placeholder="Id" disabled></th>
                         <th id = "action_header">Details</th>
-                        <th><input type="text" class="form-control" placeholder="Quality Score" disabled></th>
-                        <th id = "action_header">Evaluated</th>
+                        <!--<th><input type="text" class="form-control" placeholder="Quality Score" disabled></th>-->
+                        <th id = "action_header" class = "table_header_center">Include cases</th>
                     </tr>
                 </thead>
                 <tbody id="details_view">
@@ -128,7 +133,7 @@ if ( !$db_link )
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title" id="dialog_header">Current Attributes</h4>
+        <h4 class="modal-title dialog_header"><span class="dialog_header" id="header_details"></span></h4>
       </div>
       <div class="modal-body">
 	    <div class="row">
@@ -139,7 +144,7 @@ if ( !$db_link )
             <table class="table table-responsive" id="details_table">
                 <thead>
                     <tr class="filters">
-                        <th class="table_header_center">Measurement Category</th>
+                        <th class="table_header_center">Non Response Behavior</th>
                         <th class="table_header_center">Value [%]</th>
                     </tr>
                 </thead>
@@ -149,13 +154,6 @@ if ( !$db_link )
         </div>
     	</div>
 
-      </div>
-      <div class="modal-footer">
-	  	<div class="row">
-			<div class="col-md-6 col-md-offset-3">
-				<input type="submit" name="details_btn" id="details_btn" tabindex="1" class="form-control btn btn-login" value="Close Window" data-dismiss="modal">
-			</div>
-		</div>
       </div>
     </div>
 
@@ -357,7 +355,9 @@ if ( !$db_link )
 		};
 		
 		// Saves the selected survey id
-		var survey_id = window.location.href.split("?")[1].split("=")[1];
+		var survey_id = window.location.href.split("?")[1].split("=")[1].split("&")[0];
+		
+		var filter_option = window.location.href.split("&")[1].split("=")[1];
 		
 		// Saves this responses where the statistical evaluated value should be set to
 		// false
@@ -517,7 +517,7 @@ if ( !$db_link )
 		// Fills the survey table with the actual JSON data
     	function fill_surveytable()
 		{
-			dataString = 'survey_id='+survey_id;
+			dataString = 'survey_id='+survey_id+"&filter="+filter_option;
 
 			// Save the general attributes of the new survey into the database
 			$.ajax({
@@ -571,7 +571,7 @@ if ( !$db_link )
 							get_tableclass =  "class=\"table_even\">";
 						}
 				
-						// Sets the colouring for the quality score
+						/* Sets the colouring for the quality score
 						if(this.qualityscore <= 30)
 						{
 							quality_score = "<td class = \"qs_bad\">";
@@ -583,15 +583,15 @@ if ( !$db_link )
 						else
 						{		
 							quality_score = "<td class = \"qs_good\">";
-						}
+						}*/
 				
 						rows += get_tableclass;
 				
-						rows += "<td>" + this.id + "</td><td>" + details_button + "</td>" + quality_score + this.qualityscore + "%" + "</td><td class=\"check\">" + check + "</td></tr>";
+						rows += "<td>" + this.id + "</td><td>" + details_button + "</td>"+ /*+ quality_score + this.qualityscore + "%" + "</td>*/"<td class=\"check\">" + check + "</td></tr>";
 				
 						get_tableclass = "";
 						quality_score = "";
-				
+			
 						runner ++;
 					});
 
@@ -616,6 +616,9 @@ if ( !$db_link )
 				mynode.removeChild(mynode.firstChild);
 			}
 			
+			// Show as the headline the current response id
+			$("#header_details").text("Respondent id: " + response_id);
+			
 			dataString = 'response_id='+response_id;
 
 			// Save the general attributes of the new survey into the database
@@ -638,6 +641,49 @@ if ( !$db_link )
 						var quality_score = "";
 								
 						rows += "<tr ";
+						
+						// Sets the correct name for the different non response behavior
+						non_response_name = "";
+						
+						// Rename the actual table names for better view in the grid
+						switch(this.name) 
+						{
+							case "anchoring":
+							{
+								non_response_name = "Right edge straightlining";
+								break;
+							}
+							case "priming":
+							{
+								non_response_name = "Left edge straightlining";
+								break;
+							}
+							case "incomplete":
+							{
+								non_response_name = "Incomplete";
+								break;
+							}
+							case "straight":
+							{
+								non_response_name = "Straightlining";
+								break;
+							}
+							case "dont_know":
+							{
+								non_response_name = "Don't know answers";
+								break;
+							}
+							case "conflict":
+							{
+								non_response_name = "Conflicting answers";
+								break;
+							}
+							case "speeding":
+							{
+								non_response_name = "Speeding";
+								break;
+							}	
+						}
 				
 						// Sets the different colouring
 						if(runner%2 != 0)
@@ -648,50 +694,115 @@ if ( !$db_link )
 						{
 							get_tableclass =  "class=\"table_even\">";
 						}
-				
-						if(this.name != "complete")
+						
+						if(this.name == "speeding")
 						{
 							// Sets the colouring for the measurement value
-							if(this.value <= 30)
+							if(this.value == 0)
 							{
 								m_value = "<td class = \"qs_good table_rows_center\">";
 							}
-							else if (this.value > 30 && this.value <= 75)
+							else if(this.value >= 0.5)
 							{
 								m_value = "<td class = \"qs_medium table_rows_center\">";
+							}
+							else if(this.value == -1)
+							{
+								m_value = "<td class = \" table_rows_center\" style= \"background-color: rgba(0,  0,  0, 0.32);font-weight: bold;\">"; 
 							}
 							else
 							{
 								m_value = "<td class = \"qs_bad table_rows_center\">";
 							}
 						}
-						else // For the attribute survey completion the color schema will be inverted
+						else if (this.name == "incomplete")
 						{
 							// Sets the colouring for the measurement value
-							if(this.value <= 30)
+							if(this.value == 0)
 							{
-								m_value = "<td class = \"qs_bad table_rows_center\">";
+								m_value = "<td class = \"qs_good table_rows_center\">";
 							}
-							else if (this.value > 30 && this.value <= 70)
+							else if(this.value < 30)
 							{
 								m_value = "<td class = \"qs_medium table_rows_center\">";
 							}
+							else if(this.value == -1)
+							{
+								m_value = "<td class = \" table_rows_center\" style= \"background-color: rgba(0,  0,  0, 0.32);font-weight: bold;\">"; 
+							}
 							else
 							{
+								m_value = "<td class = \"qs_bad table_rows_center\">";
+							}
+						}
+						else
+						{
+							// Sets the colouring for the measurement value
+							if(this.value == 0)
+							{
 								m_value = "<td class = \"qs_good table_rows_center\">";
+							}
+							else if(this.value == -1)
+							{
+								m_value = "<td class = \" table_rows_center\" style= \"background-color: rgba(0,  0,  0, 0.32);font-weight: bold;\">"; 
+							}
+							else
+							{
+								m_value = "<td class = \"qs_bad table_rows_center\">";
 							}
 						}
 						
-						// Checks whether the actual value =-1 => that means not available
+	
 						if(this.value == -1)
 						{
 							this.value = "N/A";
 						}
+
 						
 						rows += get_tableclass;
-				
-						rows += "<td>" + this.name + "</td>" + m_value + "" + this.value + "%" + "</td></tr>";
-				
+						
+						
+						// Remove the attribute pattern from the visible list
+						if(this.name != "patterns")
+						{
+							// If the current value of the attribute is not available then there is also no link to a further action
+							if(this.value == "N/A")
+							{
+								rows += "<td>" + non_response_name + "</td>" + m_value + "" + this.value + "</td></tr>";
+							}// If there is no detected data there is no clickable link for it
+							else if(this.value == 0 && this.name != "incomplete")
+							{
+								if(this.name != "speeding")
+								{
+									rows += "<td>" + non_response_name + "</td>" + m_value + "not detected" + "</td></tr>";
+								}
+								else
+								{
+									rows += "<td>" + non_response_name + "</td>" + m_value + (this.value/100) + "</td></tr>";
+								}
+							}
+							else if(this.value > 0 && this.name != "incomplete")
+							{
+								if(this.name != "speeding")
+								{
+									rows += "<td>" + non_response_name + "</td>" + m_value + "detected" + "</td></tr>";
+								}
+								else
+								{
+									rows += "<td>" + non_response_name + "</td>" + m_value + this.value + "</td></tr>";
+								}
+								
+							}
+							else if(this.value > 0) // Percentage view for incomplete rate
+							{
+								rows += "<td>" + non_response_name + "</td>" + m_value + "Yes" + "</td></tr>";
+							}
+							else
+							{
+								rows += "<td>" + non_response_name + "</td>" + m_value + "No" + "</td></tr>";
+							}
+						}
+
 						get_tableclass = "";
 						m_value = "";
 				
@@ -782,7 +893,13 @@ if ( !$db_link )
 			
 		}
 		
-		  		
+		// After loading the page the filter will show the selected filter option from 
+		// the URL
+		function set_filteroption_dropdown()
+		{
+			$("#filter_dropdown").val(filter_option).change();
+			
+		}  		
 	    /*****************************************/
 		/***** END Function DEFINITIONS ********/
 		/*****************************************/
@@ -791,6 +908,7 @@ if ( !$db_link )
     	
     	fill_surveytable();
     	
+    	set_filteroption_dropdown()
     	
 		/*****************************************/
 		/***** START Change Password FORM ********/
@@ -989,9 +1107,9 @@ if ( !$db_link )
 		$('[data-tt="tooltip"]').tooltip();
 		
 		// Add the survey id to the overview view
-		$("#overview").attr("href","overview.php?survey_id=" + survey_id);
-		
-		$("#details").attr("href","details.php?survey_id=" + survey_id);
+		$("#overview").attr("href","overview.php?survey_id=" + encodeURIComponent(survey_id));
+	
+		$("#details").attr("href","details.php?survey_id=" +  encodeURIComponent(survey_id) + "&attribute=" + encodeURIComponent(filter_option));
 		
 		// Onclick handler for the details button
 		$('#survey_table tbody').on('click', '.details', function(){
@@ -1022,8 +1140,7 @@ if ( !$db_link )
 					data: dataString,
 					async: false,
 					success: function(data) {
-							alert(data);
-					
+
 					},
 					error:function () {
 						show_dialog_error("Error loading the current surveys! Please try again later!");
@@ -1037,10 +1154,38 @@ if ( !$db_link )
 			// this data
 			if(local_runner == statistical_evaluated_array.length)
 			{
-				fill_surveytable();
-			}
-
+				//Recalculate the quality score of the current survey
+				dataString = 'survey_id='+survey_id;
+				
+				
+				$.ajax({
+					type:"post",
+					url:"Update_Evaluated.php",
+					dataTyp: "text",
+					data: dataString,
+					async: false,
+					success: function(data) {
+						fill_surveytable();
 						
+						// Update the quality score
+						alert(data);
+						//$("#quality_score_header").text(data.substring(data.indexOf(";")+1, data.length) + "%");
+					},
+					error:function () {
+						show_dialog_error("Error loading the current surveys! Please try again later!");
+					}				
+				});				
+			}
+		});
+		
+		// Add Drop Down filter event if a new element will be selected
+		$(document).on("change", "#filter_dropdown", function(){
+			
+			// Save the new filter option
+			filter_option = $(this).val();
+			
+			// fill the survey table
+			fill_surveytable();
 		});
 		
 		// Add click handler for the evaluated check box
@@ -1115,4 +1260,4 @@ if ( !$db_link )
 
 	
  </body>
-</html>>
+</html>

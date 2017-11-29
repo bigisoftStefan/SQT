@@ -100,8 +100,8 @@ if ( !$db_link )
                         <th><input type="text" class="form-control" placeholder="Id" disabled></th>
                         <th><input type="text" class="form-control" placeholder="Name" disabled></th>
                         <th><input type="text" class="form-control" placeholder="Topic" disabled></th>
-                        <th><input type="text" class="form-control" placeholder="Quality Score" disabled></th>
-                        <th id="action_header"> Action </th>
+                        <!--<th><input type="text" class="form-control" placeholder="Quality Score" disabled></th>-->
+                        <th style="width:15em;"> Action </th>
                     </tr>
                 </thead>
                 <tbody id="available_surveys">
@@ -164,6 +164,7 @@ if ( !$db_link )
 		   		<h4>General Attributes</h4>
 				<input type="text" style="margin-bottom: 2em; margin-top: 2em;" name="survey_name" id="survey_name" tabindex="1" class="form-control" placeholder="Name of the survey" value="">
 				<input type="text" style="margin-bottom: 2em;" name="survey_topic" id="survey_topic" tabindex="2" class="form-control" placeholder="Survey category" value="">
+				<input type="text" style="margin-bottom: 2em;" name="survey_link" id="survey_link" tabindex="3" class="form-control" placeholder="Link to the existing survey" value="">
 				<h4>Measurement Category</h4>
 				<table class="table" style="margin-top: 2em;">
 					<tbody>
@@ -191,10 +192,10 @@ if ( !$db_link )
 							<td style="vertical-align: middle;">Straight lining</td>
 							<td style="text-align: right"><input id="toggle_straight" checked type="checkbox" data-toggle="toggle"></td>
 						</tr>
-						<tr>
+						<!--<tr>
 							<td style="vertical-align: middle;">Patterns</td>
 							<td style="text-align: right"><input id="toggle_patterns" checked type="checkbox" data-toggle="toggle"></td>
-						</tr>
+						</tr>-->
 						<tr>
 							<td style="vertical-align: middle;">Survey completion</td>
 							<td style="text-align: right"><input id="toggle_completion" checked type="checkbox" data-toggle="toggle"></td>
@@ -241,9 +242,6 @@ if ( !$db_link )
        <form id="export_survey_form" action="" method="post" role="form">
 	   		<div class="form-group" id="form_export_survey">
 				<input type="text" name="file_name" id="file_name" tabindex="1" class="form-control" placeholder="File name for the CSV export" value="">
-			</div>
-			<div class="progress" id="div_export" style="display: none;">
-				<div class="progress-bar" id="export_survey_bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"><span id="bar_label_export">0%</span></div>
 			</div>
 			<div class="alert alert-success alert-dismissable" id="hidden_dialog_export_survey" style="display: none;">
 				<strong>The survey is successfully exported!</strong>
@@ -342,6 +340,21 @@ if ( !$db_link )
 		
 		// Checks whether the response is complete for caluclating the speeding value
 		var response_completed = false;
+		
+		// Survey id for export
+		var survey_id_export = -1;
+		
+		// Specifies the path of the property file
+		var file ="property.txt";
+		
+		// Definition of the different answer options
+		var first_answer_option = "";
+		
+		var last_answer_option = "";
+		
+		var dont_answer_option = "";
+		
+		var answer_count_option = "";
 				
 		/*****************************************/
 		/***** END Variable DEFINITIONS ********/
@@ -511,6 +524,7 @@ if ( !$db_link )
 				
 						var get_tableclass = "";
 						var quality_score = "";
+						link_button = "";
 						rows += "<tr id = allsurvey_row_" + this.id + "\ data-id = " + this.id + " ";
 				
 						// Sets the different colouring
@@ -523,7 +537,7 @@ if ( !$db_link )
 							get_tableclass =  "class=\"table_even\">";
 						}
 				
-						// Sets the colouring for the quality score
+						/* Sets the colouring for the quality score
 						if(this.qualityscore <= 30)
 						{
 							quality_score = "<td class = \"qs_bad\">";
@@ -535,15 +549,28 @@ if ( !$db_link )
 						else
 						{
 							quality_score = "<td class = \"qs_good\">";
-						}
+						}*/
 				
 						rows += get_tableclass;
+						
+						if(this.survey_link == null)
+						{
+							link_button = "<button type=\"button\" id = \"link_"+ this.id + "\"" + 
+						"class=\"btn btn-default disabled survey_link\" style=\"margin-left:3%;color: white;background-color: rgba(98, 96, 96, 0.93);\": value=" + this.survey_link + " data-toggle=\"tooltip\" title= \"Redirect to your survey.\" >"
+						}
+						else
+						{
+							link_button = "<button type=\"button\" id = \"link_"+ this.id + "\"" + 
+						"class=\"btn btn-default survey_link\" style=\"margin-left:3%;color: white;background-color: rgba(232, 174, 28, 0.88);\": value=" + this.survey_link + " data-toggle=\"tooltip\" title= \"Redirect to your survey.\" >"
+						}
+					
 				
-						rows += "<td>" + this.id + "</td><td>" + this.name + "</td><td>" + this.topic + "</td>" + quality_score + "" + this.qualityscore + "%" + "</td>" +
+						rows += "<td>" + this.id + "</td><td>" + this.name + "</td><td>" + this.topic + "</td>" + /*quality_score + "" + this.qualityscore + "%" + "</td>" +*/
 						"<td id=\"action_buttons\"><button type=\"button\" id = \"details_"+ this.id + "\"" + "class=\"btn btn-default details\" data-toggle=\"tooltip\" title= \"Details for the survey.\" >" + "<span class=\"glyphicon glyphicon-info-sign\"></span>" + 
 						"</button><button type=\"button\" data-tt=\"tooltip\" data-toggle=\"modal\" title=\"Export your survey data.\" id =\"export_" + this.id + "\"" + 
-						"class=\"btn btn-default export\" data-target=\"#export_survey_modal\"><span class=\"glyphicon glyphicon-floppy-disk\"></span>" + "</button><button type=\"button\" data-toggle=\"tooltip\" title=\"Delete your survey.\" id =\"delete_"+ this.id + 
-						"\" class=\"btn btn-default remove\"><span class=\"glyphicon glyphicon-trash\"></span></button></td></tr>";
+						"class=\"btn btn-default export\" data-target=\"#export_survey_modal\"><span class=\"glyphicon glyphicon-floppy-disk\"></span>" + link_button + "<span class=\"glyphicon glyphicon glyphicon-eye-open\"></span>" + 
+						"</button><button type=\"button\" data-toggle=\"tooltip\" title=\"Delete your survey.\" id =\"delete_"+ this.id + "\" class=\"btn btn-default remove\"><span class=\"glyphicon glyphicon-trash\"></span></button></td></tr>";
+				
 				
 						get_tableclass = "";
 						quality_score = "";
@@ -601,14 +628,14 @@ if ( !$db_link )
 			
 			// If there are to few answer possibilities no
 			// recommentaion can be given 
-			if(answer_count <= 3)
+			if(answer_count <= answer_count_option)
 			{
 				return 0;
 			}
 			
 			for(i = 0; i < answer_array.length; i ++)
 			{
-				if(answer_array[i] === "A1")
+				if(answer_array[i] === first_answer_option)
 				{
 					priming_count ++;
 				}
@@ -631,14 +658,14 @@ if ( !$db_link )
 			
 			// If there are to few answer possibilities no
 			// recommentaion can be given 
-			if(answer_count <= 3)
+			if(answer_count <= answer_count_option)
 			{
 				return 0;
 			}
 			
 			for(i = 0; i < answer_array.length; i ++)
 			{
-				if(answer_array[i] === "A4")
+				if(answer_array[i] === last_answer_option)
 				{
 					anchor_count ++;
 				}
@@ -661,14 +688,14 @@ if ( !$db_link )
 			
 			// If there are to few answer possibilities no
 			// recommentaion can be given 
-			if(answer_count <= 3)
+			if(answer_count <= answer_count_option)
 			{
 				return 0;
 			}
 			
 			for(i = 0; i < answer_array.length; i ++)
 			{
-				if(answer_array[i] === "A6")
+				if(answer_array[i] === dont_answer_option)
 				{
 					priming_count ++;
 				}
@@ -697,7 +724,7 @@ if ( !$db_link )
 						
 			// If there are to few answer possibilities no
 			// recommentaion can be given 
-			if(answer_count <= 3)
+			if(answer_count <= answer_count_option)
 			{
 				return 0;
 			}
@@ -733,34 +760,6 @@ if ( !$db_link )
 			return 0;
 		}
 		
-		function calculate_pattern(answers)
-		{
-			if(get_answeramount(answers) == 0)
-			{
-				return 0;
-			}
-			
-			answer_array = answers.split(';');
-			answer_count = get_answeramount(answers);
-			previous_answer = "";
-			up = true;
-			
-			// Stores the maximum straight into the counter
-			pattern_counter = 0;
-						
-			// If there are to few answer possibilities no
-			// recommentaion can be given 
-			if(answer_count <= 3)
-			{
-				return 0;
-			}
-			
-			
-						
-			return 0;
-
-		}
-		
 		// Draws the add progress bar
 		function drawprogressbar_add(maxsize, current_size)
 		{	
@@ -777,12 +776,12 @@ if ( !$db_link )
 		}
 		
 		// Saves the general attributes of the online survey into the data base
-		function insert_Survey(survey_name,survey_topic)
+		function insert_Survey(survey_name,survey_topic,survey_link)
 		{
 			user_mail_address = change_pwd_mail;
 			survey_id = 0;
 			
-			dataString = 'survey_name='+survey_name+'&survey_topic='+survey_topic+"&user_mail_address="+user_mail_address;
+			dataString = 'survey_name='+survey_name+'&survey_topic='+survey_topic+'&survey_link='+survey_link+"&user_mail_address="+user_mail_address;
 
 			// Save the general attributes of the new survey into the database
 			$.ajax({
@@ -933,7 +932,7 @@ if ( !$db_link )
 			pattern = 0;
 			// Will be calulcated later on when all data is available
 			speed = -1;
-			complete = 0;
+			incomplete = 100;
 			
 			// Amount of all answer options for all questions
 			answer_options = 0;
@@ -1034,7 +1033,7 @@ if ( !$db_link )
 					 			// If the survey is completed 100 percent will be assigned
 					 			if(this.eventName === "TRUE")
 					 			{
-					 				complete = 100;
+					 				incomplete = 0;
 					 				response_completed = true;
 					 			}
 				 			}
@@ -1042,7 +1041,7 @@ if ( !$db_link )
 				 	}
 				 	else
 				 	{
-					 	complete = -1;
+					 	incomplete = -1;
 				 	}
 				 	
 				 	checker ++;				 			
@@ -1052,7 +1051,7 @@ if ( !$db_link )
 		 	if(checker === json_object.actionDetails.length)
 		 	{
 		 		// Data String for saving the attributes
-		 		dataString_Attributes = 'response_id='+response_id+'&priming='+calculate_percentage_attributes(answer_options,priming) +'&anchor='+calculate_percentage_attributes(answer_options,anchor)+'&don_t='+calculate_percentage_attributes(answer_options,don_t)+'&conflict='+calculate_percentage_attributes(answer_options,conflict)+'&straight='+calculate_percentage_attributes(answer_options,straight)+'&pattern='+calculate_percentage_attributes(answer_options,pattern)+'&complete='+complete;
+		 		dataString_Attributes = 'response_id='+response_id+'&priming='+calculate_percentage_attributes(answer_options,priming) +'&anchor='+calculate_percentage_attributes(answer_options,anchor)+'&don_t='+calculate_percentage_attributes(answer_options,don_t)+'&conflict='+calculate_percentage_attributes(answer_options,conflict)+'&straight='+calculate_percentage_attributes(answer_options,straight)+'&pattern='+calculate_percentage_attributes(answer_options,pattern)+'&complete='+incomplete;
 				 	
 		 		// Send this calculation data to the php page
 		 		$.ajax({
@@ -1078,6 +1077,49 @@ if ( !$db_link )
 		 	}
 		 	
 			return Math.round(((attribute / answer_options) * 100));
+		}
+		
+		// Reads the property file for the current thresholds for calculation
+		function readPropertyFile(file)
+		{
+		    var rawFile = new XMLHttpRequest();
+		    rawFile.open("GET", file, false);
+		    rawFile.onreadystatechange = function ()
+		    {
+		        if(rawFile.readyState === 4)
+		        {
+		            if(rawFile.status === 200 || rawFile.status == 0)
+		            {
+		                var allText = rawFile.responseText;
+		                
+		                // Get the different properties from the text file
+		                survey_options = allText.split(";");
+		                
+		                // Set the parameter for the first answer option
+		                first_answer_option =  survey_options[0].split("=")[1];
+		                
+		                // Set the parameter for the last answer option
+		                last_answer_option =  survey_options[1].split("=")[1];
+		                
+		                // Set the paremter for the dont know option
+		                dont_answer_option =  survey_options[2].split("=")[1];
+		                
+		                // Set the parameter for the number of answers
+		                answer_count_option = survey_options[3].split("=")[1];   
+		                
+		            }
+		            if(rawFile.status === 404)
+		            {
+			            // Set default values
+			            first_answer_option = "A1";
+			            last_answer_option = "A4";
+			            dont_answer_option = "A5";
+			            
+			            answer_count_option = 3;
+		            }
+		        }
+		    }
+			rawFile.send(null);
 		}
 	    		    
 	    /*****************************************/
@@ -1282,8 +1324,10 @@ if ( !$db_link )
 	     	$("#div_add").removeAttr("style");
 			$("#addsurvey").attr("disabled","disabled");
 			
-			insert_Survey($("#survey_name").val(),$("#survey_topic").val());
-		 	
+			readPropertyFile(file);
+			
+			insert_Survey($("#survey_name").val(),$("#survey_topic").val(),$("#survey_link").val());
+			
   		});
   		  		
 		/*****************************************/
@@ -1352,12 +1396,25 @@ if ( !$db_link )
 			},2000);
 		});
 		
+		/********************************************/
+		/****** DEFINITION OF ACTION BUTTONS ********/
+		/********************************************/
+		
 		// Add click handler for the details view
 		$(document).on("click", ".details", function(){
 			
 			survey_id_redirect = $(this).attr("id").substring($(this).attr("id").indexOf("_") + 1,$(this).attr("id").length);
 			
 			window.location.href = "overview.php?survey_id=" + survey_id_redirect;
+		});
+		
+		// Add click handler for the survey link
+		$(document).on("click", ".survey_link", function(){
+			
+			external_link = $(this).val();
+			
+			window.open(external_link, "_blank");
+			
 		});
 		
 		// Add click handler for deleting the survey including all answers and responses
@@ -1394,6 +1451,148 @@ if ( !$db_link )
 			
 		});
 		
+		// Click on the export action button, thereafter the id will be saved
+		$(document).on("click", "button.export", function(){
+			
+			survey_id_export = $(this).attr("id").substring($(this).attr("id").indexOf("_") + 1,$(this).attr("id").length);	
+		});
+		
+		// For the export all needed data was entered so the selected survey could be exported
+		$("#exportsurvey").click(function(){
+		
+			$("#file_name").attr("disabled","disabled");
+			
+			save_file_name = $("#file_name").val();
+			
+			$("#div_export").removeAttr("style");
+			$("#exportsurvey").attr("disabled","disabled");
+			
+			// Data String for saving the attributes
+		 	dataString_Export = 'survey_id='+survey_id_export;
+		 					 	
+		 	// Send this calculation data to the php page
+		 	$.ajax({
+					type:"post",
+					url:"ExportSurvey.php",
+					data: dataString_Export,
+					async: false,
+					success: function(data) {
+						
+						json_object = JSON.parse(data);
+						json_object_responses = JSON.parse(data);
+						var question_headline = [];
+						question_available = false;
+						headline = "Response Id, Incomplete, Speeding, Straightlining, Left edge straightlining, Right edge straightlining, Don't know answers, Conflicting answers, ";
+						responses = "";
+						
+						// Get the question number and also the questions for the current survey
+						$.each(json_object, function(){
+						
+							if((this.incomplete == 0) && (question_available == false))
+							{
+								for(run = 0; run < this.questions.length; run ++)
+								{
+									// Add quotes to the intial part if a semi colon is present in the text
+									question_headline.push("\"" + this.questions[run].question + "\"");
+								}
+								
+								question_available = true;
+							}
+						});
+						
+						// Connect the headline together
+						for(run = 0; run < question_headline.length; run ++)
+						{
+							if((run + 1) < question_headline.length)
+							{
+								headline = headline + question_headline[run] + ", ";
+							}
+							else
+							{
+								headline = headline + question_headline[run] + "\n";
+							}
+						}
+						
+						// Build the answering set
+						$.each(json_object_responses, function(){
+						
+							// Get the different attributes and convert it in accordance to the response details view
+							
+							// First incomplete
+							if(this.incomplete > 0)
+							{
+								this.incomplete = "Yes";
+							}
+							else if (this.incomplete == -1)
+							{
+								this.incompleze = "N/A";
+							}
+							else
+							{
+								this.incomplete = "No";
+							}
+							
+							if(this.speeding == -1)
+							{
+								this.speeding = "N/A";
+							}
+							else
+							{
+								this.speeding = this.speeding/100;
+							}
+							
+							first_response = this.id + ", " + this.incomplete + ", " + this.speeding + ", " + behaviour_detected(this.straight) + ", " + behaviour_detected(this.priming) + ", " + behaviour_detected(this.anchoring) + ", " + behaviour_detected(this.dont) + ", " + behaviour_detected(this.conflict) + ", ";
+							
+							for(run = 0; run < this.questions.length; run ++)
+							{
+								if((run + 1) < question_headline.length)
+								{
+									// Add quotes to the intial part if a semi colon is present in the text
+									first_response = first_response + "\"" + this.questions[run].answer + "\"" + ", ";
+								}
+								else
+								{
+									first_response = first_response + "\"" + this.questions[run].answer + "\"";
+								}
+							}
+							
+							// Add the response to the answer string
+							responses = responses + first_response + "\n";
+						});
+						
+						var blob = new Blob([headline,responses], {type: "text/plain;charset=utf-8"});
+						
+						saveAs(blob, save_file_name+".csv");
+						
+						$("#hidden_dialog_export_survey").removeAttr("style");
+						
+						setTimeout(function() 
+						{
+							$("#export_survey_form").submit();
+						},1500);
+												
+					},
+					error:function () {
+						alert("error saving the respons attributes");
+					}
+			});
+		});		
+
+		function behaviour_detected(value)
+		{
+			if(value > 0)
+			{
+				return "detected";
+			}
+		
+			if(value == -1)
+			{
+				return "N/A";
+			}
+			
+			return "not detected";
+		}
+		
 		// Checks whether the file name for the exported survey is larger than 1
 		$("#file_name").keyup(function() {
 			
@@ -1421,39 +1620,7 @@ if ( !$db_link )
 				
 			activateExportSurvey();
 		});
-		
-		// Progress bar for exporting the survey
-		$("#exportsurvey").click(function(){
-			
-			$("#file_name").attr("disabled","disabled");
-			
-			save_file_name = $("#file_name").val();
-			
-			$("#div_export").removeAttr("style");
-			$("#exportsurvey").attr("disabled","disabled");
-			
-			
-			
-			// GETTING THE QUESTION TEXT + ANSWER FOR ONE RESPONSE
-			/* Select Response_Data.question_text, Response_Data.answer from Surveys join Responses on Surveys.id = Responses.survey_id join Response_Data on Responses.id = Response_Data.response_id where Surveys.id = 87 AND Responses.id = 665 and Responses.evaluated = 1 ORDER by Response_Data.id */
-			
-			// GET THE DIFFERENT ATTRIBUTES OF THE CURRENT RESPONSE
-			/*SELECT Responses.quality_score, Measuring_Attributes.patterns, Measuring_Attributes.dont_know, Measuring_Attributes.priming, Measuring_Attributes.conflict, Measuring_Attributes.anchoring, Measuring_Attributes.anchoring, Measuring_Attributes.straight, Measuring_Attributes.speeding, Measuring_Attributes.complete FROM Responses join Response_Measuring on Responses.id = Response_Measuring.response_id join Measuring_Attributes on Measuring_Attributes.id = Response_Measuring.measuring_id WHERE Responses.survey_id = 87 and Responses.evaluated = 1*/
-						
-			// save the file to the download directory according to the file name
-			var blob = new Blob(["Id, UserID, QualityScore, ResponseTime, Priming, Straight, Dont, Speeding, Anchoring, Patterns, Conflict, Completed \n" +
-			"1, 112122, 78, 100, 65, 10, N/A , 5, 10, 20, N/A, 100 \n" +
-			"2, 189800, 10, 10, N/A, N/A, N/A, N/A, N/A, N/A, N/A, 0 \n" +
-			"3, 321321, 62, 110, 33, 68, 10, 3, 33, N/A, N/A, 100 \n" + 
-			"4, 342232, 20, 20, 4, 0, N/A, N/A, 0, N/A, N/A, 0 \n" +
-			"5, 441231, 40, 50, 55, 3, N/A, 40, 22, 5, N/A, 100"], {type: "text/plain;charset=utf-8"});
-			saveAs(blob, save_file_name+".csv");
-									
-			setTimeout(function() {
-					$("#export_survey_form").submit();
-					},3000);
-		});
-		
+				
 		fill_surveytable();
 		
 		// Tooltip for the GUI elements

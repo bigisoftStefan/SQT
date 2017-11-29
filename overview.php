@@ -50,7 +50,9 @@ if ( !$db_link )
   </head>
   <body id ="body">
 	    
-    <h1 class="text-center" id = "headline">Quality Score <span id="quality_score_header"></span><br /><span id="survey_title_header"></span></h1>
+    <!--<h1 class="text-center" id = "headline">Quality Score <span id="quality_score_header"></span><br /><span id="survey_title_header"></span></h1>-->
+    
+    <h1 class="text-center" id = "headline">Overview about Survey<br /><span id="survey_title_header"></span></h1>
     
     <!-- Definition of the nav bar -->
 	<nav class="navbar navbar-light navbar-fixed-top" id="navbar">
@@ -64,7 +66,7 @@ if ( !$db_link )
   		<div class="pull-right">
             <ul class="nav navbar-nav">
 	            <li class="pull-left"><a href="#" data-toggle="modal" data-target="#compareSurvey" class="btn-lg" ><span class="glyphicon glyphicon-transfer" id="icon_navbar"></span></a></li>
-	            <li class="pull-left"><a href="#" data-toggle="modal" data-target="#showThreshold" class="btn-lg" ><span class="glyphicon glyphicon-list" id="icon_navbar"></span></a></li>
+	            <!--<li class="pull-left"><a href="#" data-toggle="modal" data-target="#showThreshold" class="btn-lg" ><span class="glyphicon glyphicon-list" id="icon_navbar"></span></a></li>-->
                 <li class="dropdown pull-right">
                 <a href="#" class="dropdown-toggle btn-lg" data-toggle="dropdown"><span class="glyphicon glyphicon-user" id="icon_navbar" aria-hidden="true"></span><b class="caret" id="caret_navbar"></b></a>
                     <ul class="dropdown-menu">
@@ -77,7 +79,7 @@ if ( !$db_link )
         </div>
 	</nav>
 	
-	<div class="row" id="pie_chart"></div>
+	<!--<div class="row" id="pie_chart"></div>-->
 	
 	<!-- Inspired from http:\//bootsnipp.com/snippets/featured/panel-tables-with-filter-->
 	<div class="row">
@@ -88,8 +90,8 @@ if ( !$db_link )
             <table class="table table-responsive" id="survey_table">
                 <thead>
                     <tr class="filters">
-                        <th class="table_header_center">Measurement Category</th>
-                        <th class="table_header_center">Value [%]</th>
+                        <th class="table_header_center">Negative Response Behavior</th>
+                        <th class="table_header_center">Detection Rate</th>
                         <th class="table_header_center">Responses [n]</th>
                         <th class="table_header_center">Responses [%]</th>
                     </tr>
@@ -161,9 +163,9 @@ if ( !$db_link )
 	  	<table class="table table-responsive" id="compare_surveys">
             <thead>
                 <tr class="filters">
-                    <th class="table_header_center">Measurement Category</th>
-                    <th class="table_header_center">Value [%] current survey</th>
-                    <th class="table_header_center">Value [%] comparable survey</th>
+                    <th class="table_header_center">Negative Response Behavior</th>
+                    <th class="table_header_center">Detection Rate current survey</th>
+                    <th class="table_header_center">Detection Rate comparable survey</th>
                 </tr>
             </thead>
             <tbody id="survey_compare">
@@ -334,7 +336,7 @@ if ( !$db_link )
 		};
 		
 		// Saves the selected survey id
-		var survey_id = window.location.href.split("?")[1].split("=")[1];
+		var survey_id = window.location.href.split("?")[1].split("=")[1].split("&")[0];
 					
 		/*****************************************/
 		/***** END Variable DEFINITIONS ********/
@@ -509,6 +511,48 @@ if ( !$db_link )
 						var get_tableclass = "";
 						var quality_score = "";
 						rows += "<tr ";
+						
+						non_response_name = "";
+						
+						// Rename the actual table names for better view in the grid
+						switch(this.name) 
+						{
+							case "anchoring":
+							{
+								non_response_name = "Right edge straightlining";
+								break;
+							}
+							case "priming":
+							{
+								non_response_name = "Left edge straightlining";
+								break;
+							}
+							case "incomplete":
+							{
+								non_response_name = "Incomplete";
+								break;
+							}
+							case "straight":
+							{
+								non_response_name = "Straightlining";
+								break;
+							}
+							case "dont_know":
+							{
+								non_response_name = "Don't know answers";
+								break;
+							}
+							case "conflict":
+							{
+								non_response_name = "Conflicting answers";
+								break;
+							}
+							case "speeding":
+							{
+								non_response_name = "Speeding";
+								break;
+							}	
+						}
 				
 						// Sets the different colouring
 						if(runner%2 != 0)
@@ -519,40 +563,66 @@ if ( !$db_link )
 						{
 							get_tableclass =  "class=\"table_even\">";
 						}
-				
-						if(this.name != "complete")
+						
+						if(this.name == "speeding")
 						{
 							// Sets the colouring for the measurement value
-							if(this.value <= 30)
+							if(this.value == 0)
 							{
 								m_value = "<td class = \"qs_good table_rows_center\">";
 							}
-							else if (this.value > 30 && this.value <= 75)
+							else if(this.value >= 0.5)
 							{
 								m_value = "<td class = \"qs_medium table_rows_center\">";
+							}
+							else if(this.value == -1)
+							{
+								m_value = "<td class = \" table_rows_center\" style= \"background-color: rgba(0,  0,  0, 0.32);font-weight: bold;\">"; 
 							}
 							else
 							{
 								m_value = "<td class = \"qs_bad table_rows_center\">";
 							}
 						}
-						else // For the attribute survey completion the color schema will be inverted
+						else if (this.name == "incomplete")
 						{
 							// Sets the colouring for the measurement value
-							if(this.value <= 30)
+							if(this.responsesp == 0)
 							{
-								m_value = "<td class = \"qs_bad table_rows_center\">";
+								m_value = "<td class = \"qs_good table_rows_center\">";
 							}
-							else if (this.value > 30 && this.value <= 70)
+							else if(this.responsesp < 30)
 							{
 								m_value = "<td class = \"qs_medium table_rows_center\">";
 							}
+							else if(this.value == -1)
+							{
+								m_value = "<td class = \" table_rows_center\" style= \"background-color: rgba(0,  0,  0, 0.32);font-weight: bold;\">"; 
+							}
 							else
 							{
+								m_value = "<td class = \"qs_bad table_rows_center\">";
+							}
+						}
+						else
+						{
+							// Sets the colouring for the measurement value
+							if(this.value == 0)
+							{
 								m_value = "<td class = \"qs_good table_rows_center\">";
+							}
+							else if(this.value == -1)
+							{
+								m_value = "<td class = \" table_rows_center\" style= \"background-color: rgba(0,  0,  0, 0.32);font-weight: bold;\">"; 
+							}
+							else
+							{
+								m_value = "<td class = \"qs_bad table_rows_center\">";
 							}
 						}
 						
+						
+					
 						if(this.value == -1)
 						{
 							this.value = "N/A";
@@ -560,14 +630,50 @@ if ( !$db_link )
 				
 						rows += get_tableclass;
 				
-						// If the current value of the attribute is not available then there is also no link to a further action
-						if(this.value == "N/A")
+						// Remove the attribute pattern from the visible list
+						if(this.name != "patterns")
 						{
-							rows += "<td>" + this.name + "</td>" + m_value + "" + this.value + "%" + "</td><td class=\"table_rows_center\">" + this.responses + "</td><td class=\"table_rows_center\">" + this.responsesp + "%" + "</td></tr>";
-						}
-						else
-						{
-							rows += "<td><a href = \"details.php?survey_id=" + survey_id + "\&attribute=" + this.name + "\">" + this.name + "</a></td>" + m_value + "" + this.value + "%" + "</td><td class=\"table_rows_center\">" + this.responses + "</td><td class=\"table_rows_center\">" + this.responsesp + "%" + "</td></tr>";
+							// If the current value of the attribute is not available then there is also no link to a further action
+							if(this.value == "N/A")
+							{
+								rows += "<td>" + non_response_name + "</td>" + m_value + "" + this.value + "</td><td class=\"table_rows_center\">" + this.responses + "</td><td class=\"table_rows_center\">" + this.responsesp + "%" + "</td></tr>";
+							}// If there is no detected data there is no clickable link for it
+							else if(this.value == 0 && this.name != "incomplete")
+							{
+								if(this.name != "speeding")
+								{
+									rows += "<td>" + non_response_name + "</td>" + m_value + "not detected" + "</td><td class=\"table_rows_center\">" + this.responses + 
+									"</td><td class=\"table_rows_center\">" + this.responsesp + "%" + "</td></tr>";
+								}
+								else
+								{
+									rows += "<td>" + non_response_name + "</td>" + m_value + (this.value/100) + "</td><td class=\"table_rows_center\">" + this.responses + 
+									"</td><td class=\"table_rows_center\">" + this.responsesp + "%" + "</td></tr>";
+								}
+							}
+							else if(this.value > 0 && this.name != "incomplete")
+							{
+								if(this.name != "speeding")
+								{
+									rows += "<td><a href = \"details.php?survey_id=" + encodeURIComponent(survey_id) + "\&attribute=" + 
+									encodeURIComponent(this.name) + "\">" + non_response_name + "</a></td>" + m_value + "detected" + "</td><td class=\"table_rows_center\">" + this.responses + "</td><td class=\"table_rows_center\">" + this.responsesp + "%" + "</td></tr>";
+								}
+								else
+								{
+									rows += "<td><a href = \"details.php?survey_id=" + encodeURIComponent(survey_id) + "\&attribute=" + 
+									encodeURIComponent(this.name) + "\">" + non_response_name + "</a></td>" + m_value + this.value + "</td><td class=\"table_rows_center\">" + this.responses + "</td><td class=\"table_rows_center\">" + this.responsesp + "%" + "</td></tr>";
+								}
+								
+							}
+							else if(this.responsesp > 0) // Percentage view for incomplete rate
+							{
+								rows += "<td><a href = \"details.php?survey_id=" + encodeURIComponent(survey_id) + "\&attribute=" + encodeURIComponent(this.name) + "\">" + non_response_name + "</a></td>" + m_value + this.responsesp + "%</td><td class=\"table_rows_center\">" + this.responses + "</td><td class=\"table_rows_center\">" + this.responsesp + "%" + "</td></tr>";
+							}
+							else
+							{
+								rows += "<td>" + non_response_name + "</td>" + m_value + this.responsesp + "</td><td class=\"table_rows_center\">" + this.responses + "</td><td class=\"table_rows_center\">" + this.responsesp + "%" + "</td></tr>";
+
+							}
 						}
 				
 						get_tableclass = "";
@@ -801,7 +907,7 @@ if ( !$db_link )
 		/*********** Start Pie Chart *************/
 		/*****************************************/
 		
-		// Build the chart
+		/* Build the chart
 		Highcharts.chart('pie_chart', {
 			chart: {
 				backgroundColor: "#e2fbf3",
@@ -842,7 +948,7 @@ if ( !$db_link )
 					color: getColor['Red']
 				}]
 			}]
-		});
+		});*/
 			
 		$('#showThreshold').on('loaded.bs.modal', function () {
   			$("input.slider")
@@ -953,6 +1059,47 @@ if ( !$db_link )
 								get_tableclass = "";
 								quality_score = "";
 								rows += "<tr ";
+								non_response_name = "";
+								
+								// Rename the actual table names for better view in the grid
+								switch(this.name) 
+								{
+									case "anchoring":
+									{
+										non_response_name = "Right edge straightlining";
+										break;
+									}
+									case "priming":
+									{
+										non_response_name = "Left edge straightlining";
+										break;
+									}
+									case "incomplete":
+									{
+										non_response_name = "Incomplete";
+										break;
+									}
+									case "straight":
+									{
+										non_response_name = "Straightlining";
+										break;
+									}
+									case "dont_know":
+									{
+										non_response_name = "Don't know answers";
+										break;
+									}
+									case "conflict":
+									{
+										non_response_name = "Conflicting answers";
+										break;
+									}
+									case "speeding":
+									{
+										non_response_name = "Speeding";
+										break;
+									}	
+								}
 						
 								// Sets the different colouring
 								if(runner%2 != 0)
@@ -963,86 +1110,162 @@ if ( !$db_link )
 								{
 									get_tableclass =  "class=\"table_even\">";
 								}
-						
-								if(this.name != "complete")
+								
+								if(this.name == "speeding")
 								{
 									// Sets the colouring for the measurement value
-									if(this.value <= 30)
+									if(this.value == 0)
 									{
 										m_value = "<td class = \"qs_good table_rows_center\">";
 									}
-									else if (this.value > 30 && this.value <= 75)
+									else if(this.value >= 0.5)
 									{
 										m_value = "<td class = \"qs_medium table_rows_center\">";
+									}
+									else if(this.value == -1)
+									{
+										m_value = "<td class = \" table_rows_center\" style= \"background-color: rgba(0,  0,  0, 0.32);font-weight: bold;\">"; 
+										this.value = "N/A";
 									}
 									else
 									{
 										m_value = "<td class = \"qs_bad table_rows_center\">";
 									}
 								}
-								else // For the attribute survey completion the color schema will be inverted
+								else if (this.name == "incomplete")
 								{
 									// Sets the colouring for the measurement value
-									if(this.value <= 30)
-									{
-										m_value = "<td class = \"qs_bad table_rows_center\">";
-									}
-									else if (this.value > 30 && this.value <= 70)
-									{
-										m_value = "<td class = \"qs_medium table_rows_center\">";
-									}
-									else
+									if(this.responsesp == 0)
 									{
 										m_value = "<td class = \"qs_good table_rows_center\">";
 									}
+									else if(this.responsesp < 30)
+									{
+										m_value = "<td class = \"qs_medium table_rows_center\">";
+									}
+									else if(this.value == -1)
+									{
+										m_value = "<td class = \" table_rows_center\" style= \"background-color: rgba(0,  0,  0, 0.32);font-weight: bold;\">";
+										this.value = "N/A"; 
+									}
+									else
+									{
+										m_value = "<td class = \"qs_bad table_rows_center\">";
+									}
 								}
-								
-								if(this.value == -1)
-								{
-									this.value = "N/A";
-								}
-								
-								if(compare_object[index].name != "complete")
+								else
 								{
 									// Sets the colouring for the measurement value
-									if(compare_object[index].value <= 30)
+									if(this.value == 0)
+									{
+										m_value = "<td class = \"qs_good table_rows_center\">";
+										this.value = "not detected";
+									}
+									else if(this.value == -1)
+									{
+										m_value = "<td class = \" table_rows_center\" style= \"background-color: rgba(0,  0,  0, 0.32);font-weight: bold;\">";
+										this.value = "N/A";
+									}
+									else
+									{
+										m_value = "<td class = \"qs_bad table_rows_center\">";
+										this.value = "detected";
+									}
+								}
+								
+								if(compare_object[index].name == "speeding")
+								{
+									// Sets the colouring for the measurement value
+									if(compare_object[index].value == 0)
 									{
 										c_value = "<td class = \"qs_good table_rows_center\">";
 									}
-									else if (compare_object[index].value > 30 && compare_object[index].value <= 75)
+									else if(compare_object[index].value >= 0.5)
 									{
 										c_value = "<td class = \"qs_medium table_rows_center\">";
+									}
+									else if(compare_object[index].value == -1)
+									{
+										c_value = "<td class = \" table_rows_center\" style= \"background-color: rgba(0,  0,  0, 0.32);font-weight: bold;\">";
+										compare_object[index].value = "N/A"; 
 									}
 									else
 									{
 										c_value = "<td class = \"qs_bad table_rows_center\">";
 									}
 								}
-								else // For the attribute survey completion the color schema will be inverted
+								else if (compare_object[index].name == "incomplete")
 								{
 									// Sets the colouring for the measurement value
-									if(compare_object[index].value <= 30)
-									{
-										c_value = "<td class = \"qs_bad table_rows_center\">";
-									}
-									else if (compare_object[index].value > 30 && compare_object[index].value <= 70)
-									{
-										c_value = "<td class = \"qs_medium table_rows_center\">";
-									}
-									else
+									if(compare_object[index].responsesp == 0)
 									{
 										c_value = "<td class = \"qs_good table_rows_center\">";
 									}
+									else if(compare_object[index].responsesp < 30)
+									{
+										c_value = "<td class = \"qs_medium table_rows_center\">";
+									}
+									else if(compare_object[index].value == -1)
+									{
+										c_value = "<td class = \" table_rows_center\" style= \"background-color: rgba(0,  0,  0, 0.32);font-weight: bold;\">";
+										compare_object[index].value = "N/A"; 
+									}
+									else
+									{
+										c_value = "<td class = \"qs_bad table_rows_center\">";
+									}
 								}
-								
-								if(compare_object[index].value == -1)
+								else
 								{
-									compare_object[index].value = "N/A";
+									// Sets the colouring for the measurement value
+									if(compare_object[index].value == 0)
+									{
+										c_value = "<td class = \"qs_good table_rows_center\">";
+										compare_object[index].value = "not detected";
+									}
+									else if(compare_object[index].value == -1)
+									{
+										c_value = "<td class = \" table_rows_center\" style= \"background-color: rgba(0,  0,  0, 0.32);font-weight: bold;\">"; 
+										compare_object[index].value = "N/A";
+									}
+									else
+									{
+										c_value = "<td class = \"qs_bad table_rows_center\">";
+										compare_object[index].value = "detected";
+									}
 								}
-						
+									
 								rows += get_tableclass;
-						
-								rows += "<td>" + this.name + "</td>" + m_value + "" + this.value + "%" + "</td>" + c_value + "" + compare_object[index].value + "%" + "</td></tr>";
+								
+								// Remove the attribute pattern from the visible list
+								if(this.name != "patterns")
+								{
+									// If the current value of the attribute is not available then there is also no link to a further action
+									if((this.value == "N/A") || (compare_object[index].value == "N/A"))
+									{
+										rows += "<td>" + non_response_name + "</td>" + m_value + this.value + "</td>" + c_value + compare_object[index].value +"</td></tr>";
+									}// If there is no detected data there is no clickable link for it
+									else if(this.name != "incomplete")
+									{
+										if(this.name != "speeding")
+										{
+											rows += "<td>" + non_response_name + "</td>" + m_value + this.value + "</td>" + c_value + compare_object[index].value + "</td></tr>";
+										}
+										else
+										{
+											rows += "<td>" + non_response_name + "</td>" + m_value + (this.value/100) + "</td>" + c_value + (compare_object[index].value/100) + "<td></tr>";
+										}
+									}
+									else if(this.responsesp > 0) // Percentage view for incomplete rate
+									{
+										rows += "<td>" + non_response_name + "</td>" + m_value + this.responsesp + "%</td>" + c_value + compare_object[index].responsesp  + "%</td></tr>";
+									}
+									else
+									{
+										rows += "<td>" + non_response_name + "</td>" + m_value + this.responsesp + "%</td>" + c_value + compare_object[index].responsesp  + "%</td></tr>";
+		
+									}
+								}
 								
 								get_tableclass = "";
 								m_value = "";
@@ -1093,9 +1316,9 @@ if ( !$db_link )
 		$('[data-tt="tooltip"]').tooltip(); 
 		
 		// Add the survey id to the overview view
-		$("#overview").attr("href","overview.php?survey_id=" + survey_id);
+		$("#overview").attr("href","overview.php?survey_id=" + encodeURIComponent(survey_id));
 		
-		$("#details").attr("href","details.php?survey_id=" + survey_id);
+		$("#details").attr("href","details.php?survey_id=" +  encodeURIComponent(survey_id) + "&attribute=" + encodeURIComponent("all"));
 		
 });
     	
@@ -1162,4 +1385,4 @@ if ( !$db_link )
 
 	
  </body>
-</html>>
+</html>

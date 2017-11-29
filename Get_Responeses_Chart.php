@@ -28,17 +28,17 @@ $statement = null;
 switch ($response_quality) {
     case "good":
         // Get amount of each quality response
-		$statement = $db_link->prepare("SELECT Count(Responses.id) FROM Responses join Surveys on Responses.survey_id = Surveys.id where Responses.quality_score >= 75 and Surveys.id = ?");
+		$statement = $db_link->prepare("SELECT Count(Responses.id) FROM Responses join Surveys on Responses.survey_id = Surveys.id where Responses.quality_score >= 75 and Surveys.id = ? and Responses.evaluated = 1");
 		$statement->bind_param("i", $survey_id);
 		$statement->execute();
         break;
     case "medium":
-        $statement = $db_link->prepare("SELECT Count(Responses.id) FROM Responses join Surveys on Responses.survey_id = Surveys.id where Responses.quality_score > 30 and Responses.quality_score < 75 and Surveys.id = ?");
+        $statement = $db_link->prepare("SELECT Count(Responses.id) FROM Responses join Surveys on Responses.survey_id = Surveys.id where Responses.quality_score > 30 and Responses.quality_score < 75 and Surveys.id = ? and Responses.evaluated = 1");
         $statement->bind_param("i", $survey_id);
 		$statement->execute();
         break;
     case "bad":
-        $statement = $db_link->prepare("SELECT Count(Responses.id) FROM Responses join Surveys on Responses.survey_id = Surveys.id where Responses.quality_score <= 30 and Surveys.id = ?");
+        $statement = $db_link->prepare("SELECT Count(Responses.id) FROM Responses join Surveys on Responses.survey_id = Surveys.id where Responses.quality_score <= 30 and Surveys.id = ? and Responses.evaluated = 1");
         $statement->bind_param("i", $survey_id);
 		$statement->execute();
         break;

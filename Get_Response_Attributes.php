@@ -33,14 +33,14 @@
 	// Third field is the responses for this attribute in numbers
 	// Fourth field is the responses number in %
 	$survey_quality_score = array(
-	 array("patterns",0,0,0),
-	 array("dont_know",0,0,0),
-	 array("priming",0,0,0),
-	 array("conflict",0,0,0),
-	 array("anchoring",0,0,0),
-	 array("straight",0,0,0),
+	 array("incomplete",0,0,0),
 	 array("speeding",0,0,0),
-	 array("complete",0,0,0)
+	 array("straight",0,0,0),
+	 array("priming",0,0,0),
+	 array("anchoring",0,0,0),
+	 array("dont_know",0,0,0),
+	 array("conflict",0,0,0),
+	 array("patterns",0,0,0)
 	 );
 	
 	// Json array
@@ -65,7 +65,7 @@
 		$statement->close();
 		
 		// Getting the count for the responses for each attribute except the completion rate
-		for($i = 0; $i < 7; $i++)
+		for($i = 0; $i < 8; $i++)
 		{
 			$statement = $db_link->prepare("SELECT Count(Responses.id) FROM Responses join Response_Measuring on Responses.id = Response_Measuring.response_id join Measuring_Attributes on Measuring_Attributes.id = Response_Measuring.measuring_id WHERE Responses.survey_id = ? and Measuring_Attributes.".$survey_quality_score[$i][0]." > 0 and Responses.evaluated = 1 ");
 			$statement->bind_param("i", $survey_id);
@@ -98,45 +98,11 @@
 				echo "Error adding a new survey";
 				die();
 			}		
-		}
-		
-		// Get the value for the completion rate
-		$statement = $db_link->prepare("SELECT Count(Responses.id) FROM Responses join Response_Measuring on Responses.id = Response_Measuring.response_id join Measuring_Attributes on Measuring_Attributes.id = Response_Measuring.measuring_id WHERE Responses.survey_id = ? and Measuring_Attributes."
-		.$survey_quality_score[7][0]." < 100 and Responses.evaluated = 1 ");
-			$statement->bind_param("i", $survey_id);
-			$statement->execute();
-			
-			if (!($statement->errno))
-			{			
-				$statement->bind_result($db_attribute_count);
-
-				while ($statement->fetch())
-				{			
-					$survey_quality_score[7][2] = $db_attribute_count;
-					
-					if($response_count > 0)
-					{
-						$survey_quality_score[7][3] = intval(($db_attribute_count/$response_count)*100);
-					}
-					else
-					{
-						$survey_quality_score[7][3] = 0;
-					}
-				}
-				
-				$statement->close();
-			}
-			else
-			{
-				$statement->close();
-				http_response_code(404);
-				echo "Error adding a new survey";
-				die();
-			}		
+		}	
 		
 		
 		// Getting the quality score for the different attributes of the survey
-		$statement = $db_link->prepare("SELECT Measuring_Attributes.patterns, Measuring_Attributes.dont_know, Measuring_Attributes.priming, Measuring_Attributes.conflict, Measuring_Attributes.anchoring,Measuring_Attributes.straight, Measuring_Attributes.speeding, Measuring_Attributes.complete FROM Surveys join Measuring_Attributes on Surveys.measuring_id = Measuring_Attributes.id where Surveys.id = ?");
+		$statement = $db_link->prepare("SELECT Measuring_Attributes.patterns, Measuring_Attributes.dont_know, Measuring_Attributes.priming, Measuring_Attributes.conflict, Measuring_Attributes.anchoring,Measuring_Attributes.straight, Measuring_Attributes.speeding, Measuring_Attributes.incomplete FROM Surveys join Measuring_Attributes on Surveys.measuring_id = Measuring_Attributes.id where Surveys.id = ?");
 			$statement->bind_param("i", $survey_id);
 			$statement->execute();
 		
@@ -145,15 +111,15 @@
 			$statement->bind_result($db_attribute_pattern, $db_attribute_dont, $db_attribute_priming, $db_attribute_conflict, $db_attribute_anchoring, $db_attribute_straight, $db_attribute_speeding, $db_attribute_complete);
 
 			while ($statement->fetch())
-			{			
-				$survey_quality_score[0][1] = $db_attribute_pattern;
-				$survey_quality_score[1][1] = $db_attribute_dont;
-				$survey_quality_score[2][1] = $db_attribute_priming;
-				$survey_quality_score[3][1] = $db_attribute_conflict;
+			{	
+				$survey_quality_score[0][1] = $db_attribute_complete;
+				$survey_quality_score[1][1] = $db_attribute_speeding;
+				$survey_quality_score[2][1] = $db_attribute_straight;
+				$survey_quality_score[3][1] = $db_attribute_priming;
 				$survey_quality_score[4][1] = $db_attribute_anchoring;
-				$survey_quality_score[5][1] = $db_attribute_straight;
-				$survey_quality_score[6][1] = $db_attribute_speeding;
-				$survey_quality_score[7][1] = $db_attribute_complete;
+				$survey_quality_score[5][1] = $db_attribute_dont;
+				$survey_quality_score[6][1] = $db_attribute_conflict;
+				$survey_quality_score[7][1] = $db_attribute_pattern;
 			}
 				
 			$statement->close();

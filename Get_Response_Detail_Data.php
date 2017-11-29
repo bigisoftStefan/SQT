@@ -28,17 +28,17 @@ $json_array = array();
 // First field value is the name of the attribute
 // Second field value is the value of the attribute
 $response_attribute_data = array(
-	array("patterns",0),
-	array("dont_know",0),
-	array("priming",0),
-	array("conflict",0),
-	array("anchoring",0),
-	array("straight",0),
-	array("speeding",0),
-	array("complete",0)
+	 array("incomplete",0),
+	 array("speeding",0),
+	 array("straight",0),
+	 array("priming",0),
+	 array("anchoring",0),
+	 array("dont_know",0),
+	 array("conflict",0),
+	 array("patterns",0)
 );
 
-$statement = $db_link->prepare("SELECT Measuring_Attributes.patterns, Measuring_Attributes.dont_know, Measuring_Attributes.priming, Measuring_Attributes.conflict, Measuring_Attributes.anchoring, Measuring_Attributes.straight, Measuring_Attributes.speeding, Measuring_Attributes.complete FROM Measuring_Attributes join Response_Measuring on Measuring_Attributes.id = Response_Measuring.measuring_id join Responses on Response_Measuring.response_id = Responses.id where Responses.id = ?");
+$statement = $db_link->prepare("SELECT Measuring_Attributes.patterns, Measuring_Attributes.dont_know, Measuring_Attributes.priming, Measuring_Attributes.conflict, Measuring_Attributes.anchoring, Measuring_Attributes.straight, Measuring_Attributes.speeding, Measuring_Attributes.incomplete FROM Measuring_Attributes join Response_Measuring on Measuring_Attributes.id = Response_Measuring.measuring_id join Responses on Response_Measuring.response_id = Responses.id where Responses.id = ?");
 $statement->bind_param("i", $response_id);
 $statement->execute();
         
@@ -60,27 +60,27 @@ if (!($statement->errno))
 	while ($statement->fetch())
 	{	
 		// If the survey is not completed nothing to do
-		if($db_complete > 0)
+		if($db_complete == 0)
 		{
-			$response_attribute_data[0][1] = $db_patterns;
-			$response_attribute_data[1][1] = $db_dont;
-			$response_attribute_data[2][1] = $db_priming;
-			$response_attribute_data[3][1] = $db_conflict;
+			$response_attribute_data[0][1] = $db_complete;
+			$response_attribute_data[1][1] = $db_speeding;
+			$response_attribute_data[2][1] = $db_straight;
+			$response_attribute_data[3][1] = $db_priming;
 			$response_attribute_data[4][1] = $db_anchoring;
-			$response_attribute_data[5][1] = $db_straight;
-			$response_attribute_data[6][1] = $db_speeding;
-			$response_attribute_data[7][1] = $db_complete;
+			$response_attribute_data[5][1] = $db_dont;
+			$response_attribute_data[6][1] = $db_conflict;
+			$response_attribute_data[7][1] = $db_patterns;
 		}
 		else
 		{
-			$response_attribute_data[0][1] = -1;
+			$response_attribute_data[0][1] = $db_complete;
 			$response_attribute_data[1][1] = -1;
 			$response_attribute_data[2][1] = -1;
 			$response_attribute_data[3][1] = -1;
 			$response_attribute_data[4][1] = -1;
 			$response_attribute_data[5][1] = -1;
 			$response_attribute_data[6][1] = -1;
-			$response_attribute_data[7][1] = $db_complete;
+			$response_attribute_data[7][1] = -1;
 		}
 	}
     		
