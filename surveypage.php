@@ -37,6 +37,8 @@ if ( !$db_link )
 
     <!-- Bootstrap -->
     <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 
 	<!-- Own CSS for own style -->
 	<link href="bootstrap/css/custom.css" rel="stylesheet">
@@ -156,7 +158,7 @@ if ( !$db_link )
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title" id="dialog_header">Add a new survey to your view!</h4>
+        <h4 class="modal-title dialog_header">Add a new survey to your view!</h4>
       </div>
       <div class="modal-body">
        <form id="add_survey_form" action="" method="post" role="form">
@@ -165,6 +167,8 @@ if ( !$db_link )
 				<input type="text" style="margin-bottom: 2em; margin-top: 2em;" name="survey_name" id="survey_name" tabindex="1" class="form-control" placeholder="Name of the survey" value="">
 				<input type="text" style="margin-bottom: 2em;" name="survey_topic" id="survey_topic" tabindex="2" class="form-control" placeholder="Survey category" value="">
 				<input type="text" style="margin-bottom: 2em;" name="survey_link" id="survey_link" tabindex="3" class="form-control" placeholder="Link to the existing survey" value="">
+				<input type="text" style="margin-bottom: 2em;" name="first_answer_option" id="first_answer_option" tabindex="4" class="form-control" placeholder="Value of the first answer option" value="">
+				<input type="text" style="margin-bottom: 2em;" name="last_answer_option" id="last_answer_option" tabindex="5" class="form-control" placeholder="Value of the last answer option" value="">
 				<h4>Measurement Category</h4>
 				<table class="table" style="margin-top: 2em;">
 					<tbody>
@@ -179,6 +183,10 @@ if ( !$db_link )
 						<tr>
 							<td style="vertical-align: middle;">Don't know</td>
 							<td style="text-align: right"><input id="toggle_know" checked type="checkbox" data-toggle="toggle"></td>
+						<tr>
+							<td><input type="text" style="margin-bottom: 2em;" name="dont_answer_option" id="dont_answer_option" tabindex="6" class="form-control" placeholder="Value of the dont answer option" value=""></td>
+							<td></td>
+						</tr>
 						</tr>
 						<tr>
 							<td style="vertical-align: middle;">Conflicting answers</td>
@@ -205,8 +213,10 @@ if ( !$db_link )
 				<h4>Upload Piwik File (JSON)</h4>
 				<input type="file" style="margin-top: 2em;" id="piwik_file" accept=".json">
 			</div>
-			<div class="progress" id="div_add" style="display: none;">
-				<div class="progress-bar" id="add_survey_bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="width: 0%;"><span id="bar_label_add">0%</span></div>
+			<div class = "row ">
+				<div class="col-">
+					<button id="loading" style="width: 100%; border-color: #54bf9e; font-size: large; display: none;" class="btn btn-lg progress-bar" disabled="true"><i class="fa fa-circle-o-notch fa-spin"></i> Loading</button>
+				</div>
 			</div>
 			<div class="alert alert-success alert-dismissable" id="hidden_dialog_add_survey" style="display: none;">
 				<strong>Your new survey is now added!</strong>
@@ -760,21 +770,6 @@ if ( !$db_link )
 			return 0;
 		}
 		
-		// Draws the add progress bar
-		function drawprogressbar_add(maxsize, current_size)
-		{	
-			
-			// FURTHER WORK HERE
-			
-			progress_width = Math.round((current_size/maxsize)*100);
-		
-			
-			//alert(progress_width);
-			
-			//$("#add_survey_bar").attr("style", "width: " + progress_width + "%;");
-			//$("#add_survey_bar").attr("aria-valuenow", progress_width);
-		}
-		
 		// Saves the general attributes of the online survey into the data base
 		function insert_Survey(survey_name,survey_topic,survey_link)
 		{
@@ -801,7 +796,7 @@ if ( !$db_link )
 				}				
 			});			
 		}
-		
+				
 		// Enters the responses of the current survey
 		function insert_Responses(survey_id)
 		{
@@ -811,6 +806,7 @@ if ( !$db_link )
 		 	{
 		 		var jsonObj = JSON.parse(event.target.result);
 		 		dataset_length = jsonObj.length;
+		 		
 		 		current_data_set = 0;
 		 		var response_id = 0;
 		 		
@@ -844,7 +840,7 @@ if ( !$db_link )
 					dataStringTime = "";
 					
 					// Check whether speeding should be calculated or not
-					if($("#toggle_speeding").prop('checked') && response_completed == true)
+					if($("#toggle_speeding").prop('checked'))
 	 				{		
 		 				dataStringTime = 'response_id='+response_id+'&speeding='+'yes';
 					}
@@ -862,6 +858,7 @@ if ( !$db_link )
 			 			async: false,
 			 			data: dataStringTime,
 			 			success: function(data) {	
+				 			//alert(data);
 						},
 						error:function () {
 							show_error_adding_survey();
@@ -869,10 +866,7 @@ if ( !$db_link )
 					});
 		 			
 		 			current_data_set++;
-		 			
-		 			// Draws the progress bar
-				 	drawprogressbar_add(dataset_length, current_data_set);
-		 			
+				 	
 		 			if(dataset_length == current_data_set)
 		 			{
 			 			// The response was succesfull inserted
@@ -888,6 +882,8 @@ if ( !$db_link )
 				 			data: dataStringSurveyTime,
 				 			success: function(data) {
 				 				// All data was loaded into the data base
+				 				$("#loading").hide();
+				 				
 				 				setTimeout(function() 
 				 				{
 				 					$("#hidden_dialog_add_survey").removeAttr("style");
@@ -1323,6 +1319,8 @@ if ( !$db_link )
      	{
 	     	$("#div_add").removeAttr("style");
 			$("#addsurvey").attr("disabled","disabled");
+			
+			$("#loading").show();
 			
 			readPropertyFile(file);
 			
