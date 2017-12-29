@@ -67,7 +67,17 @@
 		// Getting the count for the responses for each attribute except the completion rate
 		for($i = 0; $i < 8; $i++)
 		{
-			$statement = $db_link->prepare("SELECT Count(Responses.id) FROM Responses join Response_Measuring on Responses.id = Response_Measuring.response_id join Measuring_Attributes on Measuring_Attributes.id = Response_Measuring.measuring_id WHERE Responses.survey_id = ? and Measuring_Attributes.".$survey_quality_score[$i][0]." > 0 and Responses.evaluated = 1 ");
+			$statement = null;
+			
+			if($survey_quality_score[$i][0] === "speeding")
+			{
+				$statement = $db_link->prepare("SELECT Count(Responses.id) FROM Responses join Response_Measuring on Responses.id = Response_Measuring.response_id join Measuring_Attributes on Measuring_Attributes.id = Response_Measuring.measuring_id WHERE Responses.survey_id = ? and Measuring_Attributes.".$survey_quality_score[$i][0]." < 100 and Measuring_Attributes." .$survey_quality_score[$i][0]. " > 0 and Responses.evaluated = 1 ");
+			}
+			else
+			{
+				$statement = $db_link->prepare("SELECT Count(Responses.id) FROM Responses join Response_Measuring on Responses.id = Response_Measuring.response_id join Measuring_Attributes on Measuring_Attributes.id = Response_Measuring.measuring_id WHERE Responses.survey_id = ? and Measuring_Attributes.".$survey_quality_score[$i][0]." > 0 and Responses.evaluated = 1 ");	
+			}
+			
 			$statement->bind_param("i", $survey_id);
 			$statement->execute();
 			

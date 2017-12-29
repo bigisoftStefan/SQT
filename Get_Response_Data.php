@@ -36,7 +36,15 @@ switch ($filter_option) {
 		$statement->execute();
         break;
     default:
-        $statement = $db_link->prepare("SELECT Responses.id, Responses.quality_score, Responses.evaluated FROM Responses join Response_Measuring on Responses.id = Response_Measuring.response_id join Measuring_Attributes on Response_Measuring.measuring_id = Measuring_Attributes.id WHERE Responses.survey_id = ? and Measuring_Attributes." . $filter_option . " > 0");
+    	if($filter_option == "speeding")
+    	{
+	    	 $statement = $db_link->prepare("SELECT Responses.id, Responses.quality_score, Responses.evaluated FROM Responses join Response_Measuring on Responses.id = Response_Measuring.response_id join Measuring_Attributes on Response_Measuring.measuring_id = Measuring_Attributes.id WHERE Responses.survey_id = ? and Measuring_Attributes." . $filter_option . " < 100 and Measuring_Attributes." . $filter_option . " > 0");
+    	}
+    	else
+    	{
+        	$statement = $db_link->prepare("SELECT Responses.id, Responses.quality_score, Responses.evaluated FROM Responses join Response_Measuring on Responses.id = Response_Measuring.response_id join Measuring_Attributes on Response_Measuring.measuring_id = Measuring_Attributes.id WHERE Responses.survey_id = ? and Measuring_Attributes." . $filter_option . " > 0");
+        }
+        
         $statement->bind_param("i", $survey_id);
 		$statement->execute();
         break;

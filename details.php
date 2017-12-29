@@ -698,11 +698,11 @@ if ( !$db_link )
 						if(this.name == "speeding")
 						{
 							// Sets the colouring for the measurement value
-							if(this.value == 0)
+							if(this.value >= 80)
 							{
 								m_value = "<td class = \"qs_good table_rows_center\">";
 							}
-							else if(this.value >= 0.5)
+							else if(this.value >= 50)
 							{
 								m_value = "<td class = \"qs_medium table_rows_center\">";
 							}
@@ -789,7 +789,7 @@ if ( !$db_link )
 								}
 								else
 								{
-									rows += "<td>" + non_response_name + "</td>" + m_value + this.value + "</td></tr>";
+									rows += "<td>" + non_response_name + "</td>" + m_value + (this.value/100) + "</td></tr>";
 								}
 								
 							}

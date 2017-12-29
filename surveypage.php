@@ -215,7 +215,7 @@ if ( !$db_link )
 			</div>
 			<div class = "row ">
 				<div class="col-">
-					<button id="loading" style="width: 100%; border-color: #54bf9e; font-size: large; display: none;" class="btn btn-lg progress-bar" disabled="true"><i class="fa fa-circle-o-notch fa-spin"></i> Loading</button>
+					<button id="loading" style="width: 100%; border-color: #54bf9e; background-color:#54bf9e;  font-size: large; display: none;" class="btn btn-lg" disabled="true"><i class="fa fa-circle-o-notch fa-spin"></i> Adding Survey</button>
 				</div>
 			</div>
 			<div class="alert alert-success alert-dismissable" id="hidden_dialog_add_survey" style="display: none;">
@@ -881,6 +881,7 @@ if ( !$db_link )
 				 			async: false,
 				 			data: dataStringSurveyTime,
 				 			success: function(data) {
+					 			
 				 				// All data was loaded into the data base
 				 				$("#loading").hide();
 				 				

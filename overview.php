@@ -567,11 +567,11 @@ if ( !$db_link )
 						if(this.name == "speeding")
 						{
 							// Sets the colouring for the measurement value
-							if(this.value == 0)
+							if(this.value >= 80)
 							{
 								m_value = "<td class = \"qs_good table_rows_center\">";
 							}
-							else if(this.value >= 0.5)
+							else if(this.value >= 50)
 							{
 								m_value = "<td class = \"qs_medium table_rows_center\">";
 							}
@@ -661,7 +661,7 @@ if ( !$db_link )
 								else
 								{
 									rows += "<td><a href = \"details.php?survey_id=" + encodeURIComponent(survey_id) + "\&attribute=" + 
-									encodeURIComponent(this.name) + "\">" + non_response_name + "</a></td>" + m_value + this.value + "</td><td class=\"table_rows_center\">" + this.responses + "</td><td class=\"table_rows_center\">" + this.responsesp + "%" + "</td></tr>";
+									encodeURIComponent(this.name) + "\">" + non_response_name + "</a></td>" + m_value + (this.value/100) + "</td><td class=\"table_rows_center\">" + this.responses + "</td><td class=\"table_rows_center\">" + this.responsesp + "%" + "</td></tr>";
 								}
 								
 							}
@@ -1114,18 +1114,17 @@ if ( !$db_link )
 								if(this.name == "speeding")
 								{
 									// Sets the colouring for the measurement value
-									if(this.value == 0)
+									if(this.value >= 80)
 									{
 										m_value = "<td class = \"qs_good table_rows_center\">";
 									}
-									else if(this.value >= 0.5)
+									else if(this.value >= 50)
 									{
 										m_value = "<td class = \"qs_medium table_rows_center\">";
 									}
 									else if(this.value == -1)
 									{
 										m_value = "<td class = \" table_rows_center\" style= \"background-color: rgba(0,  0,  0, 0.32);font-weight: bold;\">"; 
-										this.value = "N/A";
 									}
 									else
 									{
@@ -1176,11 +1175,11 @@ if ( !$db_link )
 								if(compare_object[index].name == "speeding")
 								{
 									// Sets the colouring for the measurement value
-									if(compare_object[index].value == 0)
+									if(compare_object[index].value >= 80)
 									{
 										c_value = "<td class = \"qs_good table_rows_center\">";
 									}
-									else if(compare_object[index].value >= 0.5)
+									else if(compare_object[index].value >= 50)
 									{
 										c_value = "<td class = \"qs_medium table_rows_center\">";
 									}
